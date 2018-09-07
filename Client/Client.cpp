@@ -78,3 +78,23 @@ main(int argc, char* argv[])
 	getchar();
 	return 0;
 }
+
+//crear funcion de parseo para interpretar lo que me pasan por linea de ccomando y desde el main pasarle 
+//al objeto lo leido
+//una vez recibido el buffer (buf) copiar todo a un .txt
+
+parseString clientParser(int argc, const char *argv[])	//falta analizar cuando ocurren errores... ver que es npos
+{
+	parseString route;
+	string s(argv[0]);		//copio el contenido del arreglo en un string
+	string::size_type pos = s.find_first_of('/', 0);	//busco el primer '/'
+	route.hostName = (char *) malloc(pos * sizeof(char));
+	s.copy(route.hostName, pos, 0);		//no guardo valor de retorno ya que no me interesa saber hasta que posicion llego pues es la misma que pos
+	route.hostName[pos] = '\0';			//cargo null terminated... notar que sobre escribo al '/'
+	string::size_type pos2 = s.find_first_of('\0', pos);
+	route.pathRoute = (char *)malloc(pos2 * sizeof(char));
+	s.copy(route.pathRoute, pos2, pos);
+
+	//faltan validaciones
+	return route;
+}
