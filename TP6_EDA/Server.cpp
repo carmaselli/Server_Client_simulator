@@ -1,5 +1,6 @@
 #include "Server.h"
 
+#define FEDE 3
 Server::Server()
 {
 	IO_handler = new boost::asio::io_service();
