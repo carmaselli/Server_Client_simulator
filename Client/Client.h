@@ -27,6 +27,7 @@ class Client
 public:
 	Client();
 	void startConnection(const char* host);
+	void sendMessage();
 	void receiveMessage();
 	~Client();
 private:

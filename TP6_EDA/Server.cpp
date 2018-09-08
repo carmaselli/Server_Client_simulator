@@ -1,8 +1,15 @@
 #include "Server.h"
+#include<ctime>
 
-#define FEDE 3
+
+
+
+#define LF 0x0A  //line feed
+#define CR 0x0D  //carriage return
+
 Server::Server()
 {
+	error_.type = N_ERROR;
 	IO_handler = new boost::asio::io_service();
 	boost::asio::ip::tcp::endpoint ep(boost::asio::ip::tcp::v4(), HELLO_PORT);
 
@@ -28,13 +35,15 @@ void Server::startConnection()
 		server_acceptor->accept(*socket_forServer, error);
 	} while ((error.value() == WSAEWOULDBLOCK));
 	if (error)
-		std::cout << "Error while trying to listen to " << HELLO_PORT << "Port " << error.message() << std::endl;
-
+	{
+		error_.type = CONNECTION_ERROR;
+		error_.errStr = string("Error while trying to listen to ") + to_string(HELLO_PORT) + "Port " + error.message();
+	}
 	//server_acceptor->accept(*socket_forServer);
 	socket_forServer->non_blocking(true);
 }
 
-void Server::sendMessage()
+void Server::sendMessage() //esta hay que cambiar
 {
 
 	char buf[512] = "Hello from server.";
@@ -51,6 +60,27 @@ void Server::sendMessage()
 
 }
 
+void Server::sendMessage(const char * message)
+{
+	size_t len;
+	boost::system::error_code error;
+
+	do
+	{
+		len = socket_forServer->write_some(boost::asio::buffer(message, strlen(message)), error);
+	} while ((error.value() == WSAEWOULDBLOCK));
+	if (error)
+	{
+		error_.type = CONNECTION_ERROR;
+		error_.errStr = string("Error while trying to connect to client ") + error.message();
+	}
+}
+
+error_t Server::getError()
+{
+	return error_;
+}
+
 Server::~Server()
 {
 	server_acceptor->close();
@@ -58,18 +88,4 @@ Server::~Server()
 	delete server_acceptor;
 	delete socket_forServer;
 	delete IO_handler;
-}
-int
-main(int argc, char* argv[])
-{
-	Server conquering;
-	std::cout << std::endl << "Start Listening on port " << HELLO_PORT << std::endl;
-	conquering.startConnection();
-	std::cout << "Somebody connected to port " << HELLO_PORT << std::endl;
-	std::cout << "Press Enter to Send Message  " << std::endl;
-	getchar();
-	conquering.sendMessage();
-	Sleep(50); // Le damos 50ms para que llegue el mensaje antes de cerrar el socket.
-
-	return 0;
 }
