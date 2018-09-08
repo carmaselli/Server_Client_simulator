@@ -10,7 +10,6 @@
 int main(int argc, char* argv[])
 {
 	Server myServer;
-	bool keepGoing = true;
 	std::cout << std::endl << "Start Listening on port " << HELLO_PORT << std::endl;
 	myServer.startConnection();
 	std::cout << "Somebody connected to port " << HELLO_PORT << std::endl;

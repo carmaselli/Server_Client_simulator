@@ -45,19 +45,20 @@ void Server::startConnection()
 
 void Server::sendMessage() //esta hay que cambiar
 {
-
-	char buf[512] = "Hello from server.";
-
-	size_t len;
-	boost::system::error_code error;
-
-	do
+	if (error_.type == NO_ERROR)
 	{
-		len = socket_forServer->write_some(boost::asio::buffer(buf, strlen(buf)), error);
-	} while ((error.value() == WSAEWOULDBLOCK));
-	if (error)
-		std::cout << "Error while trying to connect to server " << error.message() << std::endl;
+		char buf[512] = "Hello from server.";
 
+		size_t len;
+		boost::system::error_code error;
+
+		do
+		{
+			len = socket_forServer->write_some(boost::asio::buffer(buf, strlen(buf)), error);
+		} while ((error.value() == WSAEWOULDBLOCK));
+		if (error)
+			std::cout << "Error while trying to connect to client " << error.message() << std::endl;
+	}
 }
 
 void Server::sendMessage(const char * message)
@@ -74,6 +75,42 @@ void Server::sendMessage(const char * message)
 		error_.type = CONNECTION_ERROR;
 		error_.errStr = string("Error while trying to connect to client ") + error.message();
 	}
+}
+
+void Server::receiveMessage()
+{
+	boost::system::error_code error;
+	char buf[512];
+	size_t len = 0;
+	cout << "Receiving Message" << std::endl;
+	boost::timer::cpu_timer t;
+	t.start();
+	boost::timer::cpu_times pastTime = t.elapsed();
+	double elapsedSeconds = 0.0;
+
+	do
+	{
+		len = socket_forServer->read_some(boost::asio::buffer(buf), error);
+
+		boost::timer::cpu_times currentTime = t.elapsed();
+
+		if ((currentTime.wall - pastTime.wall) > 1e9)
+		{
+			elapsedSeconds += (currentTime.wall - pastTime.wall) / 1e9;
+			pastTime = currentTime;
+			cout << "Pasaron " << (int)floor(elapsedSeconds) << " segundos." << endl;
+		}
+
+		if (!error)
+			buf[len] = '\0';
+
+	} while (error.value() == WSAEWOULDBLOCK);
+
+	if (!error)
+		cout << std::endl << "Server sais: " << buf << std::endl;
+	else
+		cout << "Error while trying to connect to server " << error.message() << std::endl;
+
 }
 
 error_t Server::getError()

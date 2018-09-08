@@ -6,6 +6,9 @@
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
+#include <boost/asio.hpp>
+#include <boost/chrono.hpp>
+#include <boost/timer/timer.hpp>
 #include"error.h"
 
 #define HELLO_PORT 80
@@ -25,6 +28,8 @@ public:
 private:
 	error_t error_;
 	string receivedMessage;
+	string messageForClient;
+
 
 	boost::asio::io_service*  IO_handler;
 	boost::asio::ip::tcp::socket* socket_forServer;
