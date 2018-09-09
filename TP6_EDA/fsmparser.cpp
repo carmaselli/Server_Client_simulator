@@ -109,7 +109,7 @@ event_t fsmparser::
 eventGen(char* pointer)
 {
 	event_t ev;
-	ev.token = strtok(pointer, (currState == WAIT_FOR_HOST_STATE)?TWOPOINTS:SPACE); // genero token, en función del estado actual
+	ev.token = strtok(pointer, SPACE); // genero token, en función del estado actual
 
 	if (ev.token != NULL)
 	{
@@ -118,15 +118,11 @@ eventGen(char* pointer)
 			ev.currentEv = GET_EVENT;
 		}
 
-		else if (strcmp((const char *)ev.token, " HTTP/1.1 " CRLF "Host"))
+		else if (strcmp((const char *)ev.token, " HTTP/1.1 " CRLF "Host:"))
 		{
 			ev.currentEv = HTTP_STRING_EVENT;
 		}
 
-		else if (strcmp((const char *)ev.token, CRLF CRLF))
-		{
-			ev.currentEv = DOUBLECRLF_EVENT;
-		}
 
 		else
 		{

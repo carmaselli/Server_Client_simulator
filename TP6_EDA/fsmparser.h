@@ -22,22 +22,20 @@ typedef enum
 {
 	GET_EVENT,
 	HTTP_STRING_EVENT,
-	DOUBLECRLF_EVENT,
 	OTHER_EVENT
 
 }FSM_EVENTS;
 
-#define FSM_EV_COUNT 4
+#define FSM_EV_COUNT 3
 
 typedef enum
 {
 	WAIT_FOR_GET_STATE,
 	WAIT_FOR_HOST_STATE,
-	WAIT_FOR_END_STATE,
 	END_STATE
 }FSM_STATES;
 
-#define FSM_ST_COUNT 4
+#define FSM_ST_COUNT 3
 
 typedef void(*actrout_t)(void*);
 
@@ -89,11 +87,10 @@ private:
 	void cycleFSM(event_t ev);
 
 	const cells_t fsmArray[FSM_ST_COUNT][FSM_EV_COUNT]
-	{ // GET	HTTPSTRING		DOUBLECRLF  OTHER_EVENT
-		{{savePath,WAIT_FOR_HOST_STATE},{fsmError,END_STATE},{fsmError,END_STATE},{fsmError, END_STATE}}, //WAIT_FOR_GET_STATE
-		{{fsmError,END_STATE},{saveHost,WAIT_FOR_END_STATE},{fsmError,END_STATE},{fsmError,END_STATE}}, //WAIT_FOR_HOST_STATE
-		{{fsmError,END_STATE},{fsmError,END_STATE},{NULL,END_STATE},{fsmError,END_STATE}}, //WAIT_FOR_END_STATE
-		{{NULL,END_STATE},{NULL,END_STATE},{NULL,END_STATE},{NULL,END_STATE}},//END_STATE
+	{ // GET	HTTPSTRING		  OTHER_EVENT
+		{{savePath,WAIT_FOR_HOST_STATE},{fsmError,END_STATE},{fsmError, END_STATE}}, //WAIT_FOR_GET_STATE
+		{{fsmError,END_STATE},{saveHost,END_STATE},{fsmError,END_STATE}}, //WAIT_FOR_HOST_STATE
+		{{NULL,END_STATE},{NULL,END_STATE},{NULL,END_STATE}},//END_STATE
 	};
 
 
