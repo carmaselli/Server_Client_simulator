@@ -13,8 +13,23 @@ fsmparser(char* str2parse_)
 	host = "NULL";
 	path = "NULL";
 	currState = WAIT_FOR_GET_STATE; // estado inicial
-	str2parse = str2parse_;
+	str2parse = (char*)malloc(strlen(str2parse_));
+	if (str2parse == NULL)
+	{
+		error = true;
+	}
+}
 
+
+/*
+fsmparser()
+destructor del objeto fsmparser
+*/
+
+fsmparser::
+~fsmparser(void)
+{
+	free(str2parse);
 }
 
 
