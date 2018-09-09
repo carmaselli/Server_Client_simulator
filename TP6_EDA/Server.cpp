@@ -1,11 +1,10 @@
 #include "Server.h"
 #include<ctime>
+#include"fsmparser.h"
 
 
 
 
-#define LF 0x0A  //line feed
-#define CR 0x0D  //carriage return
 
 Server::Server()
 {
@@ -83,6 +82,7 @@ void Server::receiveMessage() //falta cambiar esto
 	boost::system::error_code error;
 	char buf[512];
 	size_t len = 0;
+	string receivedMessage;
 	cout << "Receiving Message" << std::endl;
 	boost::timer::cpu_timer t;
 	t.start();
@@ -90,33 +90,41 @@ void Server::receiveMessage() //falta cambiar esto
 	double elapsedSeconds = 0.0;
 
 
-	//espero recibir algo
-	//busco el archivo
-	//lleno la info de messageForClient
+	
 
-	do
+	do   //espero recibir algo
 	{
 		len = socket_forServer->read_some(boost::asio::buffer(buf), error);
 
-		boost::timer::cpu_times currentTime = t.elapsed();
-
-		if ((currentTime.wall - pastTime.wall) > 1e9)
-		{
-			elapsedSeconds += (currentTime.wall - pastTime.wall) / 1e9;
-			pastTime = currentTime;
-			cout << "Pasaron " << (int)floor(elapsedSeconds) << " segundos." << endl;
-		}
-
 		if (!error)
 			buf[len] = '\0';
-
+		receivedMessage += string(buf);
 
 	} while (error.value() == WSAEWOULDBLOCK);
 
 	if (!error)
-		cout << std::endl << "Server sais: " << buf << std::endl;
+	{
+		fsmparser Parser(receivedMessage.c_str);
+		if (Parser.getError() == false)
+		{
+			if (!Parser.parse() && !readFile(Parser.getPath().c_str())) //parseo del string
+			{
+				fillMessage();
+			}
+		}
+		else
+		{
+			error_.type = PARSER_CONSTRUCTOR_ERROR;
+			error_.errStr = string("Error while trying to create parser ");
+		}
+	}
 	else
-		cout << "Error while trying to connect to server " << error.message() << std::endl;
+	{
+		error_.type = CONNECTION_ERROR;
+		error_.errStr = string("Error while trying to connect to server ") + error.message() ;
+		
+	}
+		
 
 }
 
@@ -132,4 +140,13 @@ Server::~Server()
 	delete server_acceptor;
 	delete socket_forServer;
 	delete IO_handler;
+}
+
+bool Server::readFile(const char * path)
+{
+	return false;
+}
+
+void Server::fillMessage()
+{
 }

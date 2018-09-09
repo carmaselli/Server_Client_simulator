@@ -27,15 +27,14 @@ public:
 	~Server();
 private:
 	error_t error_;
-	string receivedMessage;
+	string htmlFileContent;
 	string messageForClient;
 
 
 	boost::asio::io_service*  IO_handler;
 	boost::asio::ip::tcp::socket* socket_forServer;
 	boost::asio::ip::tcp::acceptor* server_acceptor;
-	bool parse(char* buffer); //esto no se si vas a hacer una clase joaco, si es asi mandame un msj
-	bool readFile(char* path);
-
-
+	bool readFile(const char* path);
+	void fillMessage();
+	
 };
