@@ -18,7 +18,6 @@ fsmparser(char* str2parse_)
 }
 
 
-
 /*
 getError()
 getter del error
@@ -94,7 +93,7 @@ setPath(char * p2token_)
 event_t fsmparser::
 eventGen(char* pointer)
 {
-	event_t ev = { NULL,NULL };
+	event_t ev;
 	ev.token = strtok(pointer, (currState == WAIT_FOR_HOST_STATE)?TWOPOINTS:SPACE); // genero token, en función del estado actual
 
 	if (ev.token != NULL)
@@ -104,12 +103,12 @@ eventGen(char* pointer)
 			ev.currentEv = GET_EVENT;
 		}
 
-		else if (strcmp((const char *)ev.token, " HTTP/1.1 \r\nHost"))
+		else if (strcmp((const char *)ev.token, " HTTP/1.1 " CRLF "Host"))
 		{
 			ev.currentEv = HTTP_STRING_EVENT;
 		}
 
-		else if (strcmp((const char *)ev.token, "\r\n\r\n"))
+		else if (strcmp((const char *)ev.token, CRLF CRLF))
 		{
 			ev.currentEv = DOUBLECRLF_EVENT;
 		}
@@ -150,7 +149,7 @@ cycleFSM(event_t ev)
 bool fsmparser::
 parse(void)
 {
-	while ( (currState != END_STATE) && (error = false)) // mientras no llegué al final, y no hubo error
+	while ( (currState != END_STATE) && (error == false)) // mientras no llegué al final, y no hubo error
 	{
 		cycleFSM(eventGen(str2parse)); // ciclo la fsm
 	}
