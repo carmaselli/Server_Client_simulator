@@ -85,14 +85,7 @@ void Server::receiveMessage() //falta cambiar esto
 	size_t len = 0;
 	string receivedMessage;
 	cout << "Receiving Message" << std::endl;
-	boost::timer::cpu_timer t;
-	t.start();
-	boost::timer::cpu_times pastTime = t.elapsed();
-	double elapsedSeconds = 0.0;
-
-
 	
-
 	do   //espero recibir algo
 	{
 		len = socket_forServer->read_some(boost::asio::buffer(buf), error);
