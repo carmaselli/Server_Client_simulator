@@ -120,9 +120,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="error.h" />
+    <ClInclude Include="fsmparser.h" />
     <ClInclude Include="Server.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="fsmparser.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="serverMain.cpp" />
   </ItemGroup>
