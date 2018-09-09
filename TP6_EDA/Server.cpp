@@ -43,21 +43,22 @@ void Server::startConnection()
 	socket_forServer->non_blocking(true);
 }
 
-void Server::sendMessage() //esta hay que cambiar
+void Server::sendMessage() 
 {
 	if (error_.type == NO_ERROR)
 	{
-		char buf[512] = "Hello from server.";
-
 		size_t len;
 		boost::system::error_code error;
 
 		do
 		{
-			len = socket_forServer->write_some(boost::asio::buffer(buf, strlen(buf)), error);
+			len = socket_forServer->write_some(boost::asio::buffer(messageForClient.c_str(), messageForClient.length()), error);
 		} while ((error.value() == WSAEWOULDBLOCK));
 		if (error)
-			std::cout << "Error while trying to connect to client " << error.message() << std::endl;
+		{
+			error_.type = CONNECTION_ERROR;
+			error_.errStr = string("Error while trying to connect to client ") + error.message();
+		}
 	}
 }
 
@@ -77,7 +78,7 @@ void Server::sendMessage(const char * message)
 	}
 }
 
-void Server::receiveMessage()
+void Server::receiveMessage() //falta cambiar esto
 {
 	boost::system::error_code error;
 	char buf[512];
@@ -87,6 +88,11 @@ void Server::receiveMessage()
 	t.start();
 	boost::timer::cpu_times pastTime = t.elapsed();
 	double elapsedSeconds = 0.0;
+
+
+	//espero recibir algo
+	//busco el archivo
+	//lleno la info de messageForClient
 
 	do
 	{
@@ -103,6 +109,7 @@ void Server::receiveMessage()
 
 		if (!error)
 			buf[len] = '\0';
+
 
 	} while (error.value() == WSAEWOULDBLOCK);
 
