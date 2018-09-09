@@ -11,14 +11,12 @@ using namespace std;
 /* CONSTANTES*/
 
 #define SPACE " "
-#define CRLF "1310"
 #define TWOPOINTS ":"
-/* TYPEDEFS */
-typedef struct
-{
-	char* token;
-	FSM_EVENTS  currentEv;
-}event_t;
+
+/* PROTOTIPOS */
+void fsmError(void* pointer);
+void savePath(void* pointer);
+void saveHost(void* pointer);
 
 typedef enum 
 {
@@ -48,6 +46,13 @@ typedef struct
 	actrout_t actRout;
 	FSM_STATES nextState;
 }cells_t;
+
+/* TYPEDEFS */
+typedef struct
+{
+	char* token;
+	FSM_EVENTS  currentEv;
+}event_t;
 
 
 /* CLASS */

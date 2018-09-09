@@ -1,6 +1,10 @@
 #include "fsmparser.h"
 using namespace std;
 
+/*
+fsmparser()
+constructor del objeto fsmparser
+*/
 
 fsmparser::
 fsmparser(char* str2parse_)
@@ -12,6 +16,20 @@ fsmparser(char* str2parse_)
 	str2parse = str2parse_;
 
 }
+
+
+
+/*
+getError()
+getter del error
+*/
+
+bool fsmparser::
+getError(void)
+{
+	return error;
+}
+
 
 /*
 getHost()
