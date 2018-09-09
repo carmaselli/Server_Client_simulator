@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 	std::cout << std::endl << "Start Listening on port " << HELLO_PORT << std::endl;
 	myServer.startConnection();
 	std::cout << "Somebody connected to port " << HELLO_PORT << std::endl;
-	myServer.sendMessage("Hello from Server");
+	//myServer.sendMessage("Hello from Server");
 	do
 	{
 		myServer.receiveMessage();

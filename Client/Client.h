@@ -6,6 +6,7 @@
 #include <boost/timer/timer.hpp>
 #include <cstring>
 
+#include <cstdlib>
 #include "error.h"
 
 #define HELLO_PORT_STR "80"

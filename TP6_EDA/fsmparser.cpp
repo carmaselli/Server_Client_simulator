@@ -18,6 +18,10 @@ fsmparser(const char* str2parse_)
 	{
 		error = true;
 	}
+	else
+	{
+		strcpy(str2parse, str2parse_);
+	}
 }
 
 
@@ -109,16 +113,17 @@ event_t fsmparser::
 eventGen(char* pointer)
 {
 	event_t ev;
-	ev.token = strtok(pointer, SPACE); // genero token, en función del estado actual
+	
+	ev.token = strtok((currState == WAIT_FOR_GET_STATE) ? pointer : NULL, SPACE); // genero token, en función del estado actual
 
 	if (ev.token != NULL)
 	{
-		if (strcmp((const char *)ev.token, "GET"))
+		if (!strcmp((const char *)ev.token, "GET"))
 		{
 			ev.currentEv = GET_EVENT;
 		}
 
-		else if (strcmp((const char *)ev.token, " HTTP/1.1 " CRLF "Host:"))
+		else if (!strcmp((const char *)ev.token, "HTTP/1.1" CRLF "Host:"))
 		{
 			ev.currentEv = HTTP_STRING_EVENT;
 		}
@@ -179,7 +184,7 @@ void fsmError(void* pointer)
 void savePath(void* pointer)
 {
 	fsmparser* p2obj = (fsmparser*)pointer;
-	char* p2token = strtok(p2obj->getString(), SPACE);
+	char* p2token = strtok(NULL, SPACE);
 
 	if (p2token != NULL)
 	{
@@ -196,7 +201,7 @@ void savePath(void* pointer)
 void saveHost(void* pointer)
 {
 	fsmparser* p2obj = (fsmparser*)pointer;
-	char* p2token = strtok(p2obj->getString(), SPACE);
+	char* p2token = strtok(NULL, CRLF);
 
 	if (p2token != NULL)
 	{
