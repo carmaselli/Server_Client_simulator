@@ -1,6 +1,7 @@
 #include "Server.h"
 #include<ctime>
-#include"fsmparser.h"
+#include <boost/filesystem.hpp>
+
 
 
 
@@ -104,12 +105,16 @@ void Server::receiveMessage() //falta cambiar esto
 
 	if (!error)
 	{
-		fsmparser Parser(receivedMessage.c_str);
+		fsmparser Parser((receivedMessage.c_str()));
 		if (Parser.getError() == false)
 		{
-			if (!Parser.parse() && !readFile(Parser.getPath().c_str())) //parseo del string
+			if (!Parser.parse()) //parseo del string
 			{
-				fillMessage();
+				fillMessage(Parser);
+			}
+			else
+			{
+				//ver que hacer aca para que se repita
 			}
 		}
 		else
@@ -142,11 +147,70 @@ Server::~Server()
 	delete IO_handler;
 }
 
-bool Server::readFile(const char * path)
+void Server::readFile(FILE* filename)
 {
-	return false;
+	do
+	{
+		htmlFileContent += fgetc(filename);
+	} while (htmlFileContent.back() != EOF);
+	htmlFileContent.pop_back();
 }
 
-void Server::fillMessage()
+void Server::fillMessage(fsmparser& Parser)
 {
+	if (isFilePresent(Parser.getPath().c_str()))
+	{
+		FILE* htmlFile = fopen(Parser.getPath().c_str(), "rb");
+		readFile(htmlFile);
+		messageForClient = string("HTTP/1.1 200 OK" CRLF);
+		fillTimestamps();
+		messageForClient += string("Date: ") + timestamp + CRLF;
+		messageForClient += string("Cache-Control: public, max-age=30" CRLF);
+		messageForClient += string("Expires: ") + timestampExp + CRLF;
+		messageForClient += string("Content-Length: ") + to_string(fileLength(htmlFile)) + CRLF;
+		messageForClient += string("Content-Type: text/html; charset=iso-8859-1") + CRLF;
+		messageForClient += htmlFileContent + CRLF;
+		fclose(htmlFile);
+	}
+	else
+	{
+		messageForClient = string("HTTP/1.1 404 Not Found" CRLF);
+		fillTimestamps();
+		messageForClient += string("Date: ") + timestamp + CRLF;
+		messageForClient += string("Cache-Control: public, max-age=30" CRLF);
+		messageForClient += string("Expires: ") + timestampExp + CRLF;
+		messageForClient += string("Content-Length: 0" CRLF) ;
+		messageForClient += string("Content-Type: text/html; charset=iso-8859-1" CRLF)  ;
+	}
+}
+
+bool Server::isFilePresent(const char * path)
+{
+	FILE* temp = fopen(path, "rb");
+	if (temp != NULL)
+	{
+		fclose(temp);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+long int Server::fileLength(FILE * filename)
+{
+	fseek(filename, 0, SEEK_END);
+	long int fileLength = ftell(filename);
+	return fileLength;
+}
+
+void Server::fillTimestamps(void)
+{
+	time_t now = time(0); // get de la fecha actual en time_t
+	tm* expDate = gmtime(&now); // cambio el formato de la misma
+	time_t nowtime = mktime(expDate);
+	timestamp = ctime((const time_t*)&nowtime); // guardo en string la fecha actual
+	time_t expiration = mktime(expDate) + (time_t)30; // sumo los 30 segundos
+	timestampExp = ctime(&expiration); // guardo en string la fecha de expiración
 }

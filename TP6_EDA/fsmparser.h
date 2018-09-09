@@ -61,7 +61,7 @@ class fsmparser
 {
 public:
 
-	fsmparser(char* str2parse_);
+	fsmparser(const char* str2parse_);
 	~fsmparser(void);
 	bool parse(void);
 

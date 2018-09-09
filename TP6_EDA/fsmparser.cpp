@@ -7,7 +7,7 @@ constructor del objeto fsmparser
 */
 
 fsmparser::
-fsmparser(char* str2parse_)
+fsmparser(const char* str2parse_)
 {
 	error = false; // no hay error
 	host = "NULL";

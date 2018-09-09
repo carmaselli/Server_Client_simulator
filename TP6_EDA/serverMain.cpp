@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 	do
 	{
 		myServer.receiveMessage();
-		myServer.
+		
 		myServer.sendMessage();
 		Sleep(50); // Le damos 50ms para que llegue el mensaje antes de volver a esperar (hace falta?)		
 	} while (myServer.getError().type == NO_ERROR );

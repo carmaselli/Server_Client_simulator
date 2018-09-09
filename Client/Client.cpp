@@ -7,7 +7,7 @@ Client::Client()
 	socket_forClient = new boost::asio::ip::tcp::socket(*IO_handler);
 	client_resolver = new boost::asio::ip::tcp::resolver(*IO_handler);
 
-	error_.type == N_ERROR;
+	error_.type = N_ERROR;
 	file = fopen("webService.txt", "wb");
 	if (file == NULL)
 	{
@@ -23,8 +23,8 @@ void Client::startConnection(const char * host)
 	boost::asio::connect(*socket_forClient, endpoint, error);
 	if (error)
 	{
-		error_.type == CONNECTION_ERROR;
-		error_.errStr = string("Error while trying to listen to ") + HELLO_PORT_STR + "Port " + error.message();
+		error_.type = CONNECTION_ERROR;
+		error_.errStr = string("Error while trying to listen to ") + HELLO_PORT_STR + " Port " + error.message();
 
 		/*cout << "Error connecting to " << host << " Error Message: " << error.message() << endl;
 		if (error.value() == boost::asio::error::connection_refused)
@@ -97,7 +97,7 @@ void Client::receiveMessage()
 		else
 		{
 			error_.type = CONNECTION_ERROR;
-			error_.errStr = string("Error while trying to recive massage. ") + error.message();
+			error_.errStr = string("Error while trying to recive message. ") + error.message();
 		}
 	}
 }
@@ -119,7 +119,7 @@ Client::~Client()
 
 
 int
-main(int argc, char* argv[])
+main(int argc,const char* argv[])
 {
 	Client conquering;
 
@@ -136,8 +136,8 @@ main(int argc, char* argv[])
 			conquering.sendMessage();
 			conquering.receiveMessage();
 		}
-		free(route.hostName);
-		free(route.pathRoute);
+		//free(route.hostName);
+		//free(route.pathRoute);
 		cout << conquering.getError().errStr << endl;
 	}
 	else
