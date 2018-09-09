@@ -33,7 +33,12 @@ void Client::startConnection(const char * host)
 	socket_forClient->non_blocking(true);
 }
 
-void Client::sendMessage(parseString route)
+void Client::generateStringToSend(parseString route)
+{
+	messageToServer = "GET " + string(route.hostName) + string(route.pathRoute) + "HTTP/1.1 \r\nHost : 127.0.0.1 \r\n\r\n";
+}
+
+void Client::sendMessage(void)
 {
 	if (error_.type == N_ERROR)
 	{
@@ -42,7 +47,7 @@ void Client::sendMessage(parseString route)
 
 		do
 		{
-			len = socket_forClient->write_some(boost::asio::buffer(route.pathRoute, strlen(route.pathRoute)), error);
+			len = socket_forClient->write_some(boost::asio::buffer(messageToServer.c_str(), messageToServer.length()), error);
 		} while ((error.value() == WSAEWOULDBLOCK));
 		if (error)
 		{
@@ -86,10 +91,6 @@ void Client::receiveMessage()
 
 		if (!error)
 		{
-			/*while (len != 0)
-			{
-				fputc(messageFromServer[])
-			}*/
 			fputs(messageFromServer.c_str(), file);
 			error_.errStr = string("Succes reading from server");
 		}
@@ -109,7 +110,7 @@ error_t Client::getError()
 
 Client::~Client()
 {
-	
+	fclose(file);
 	socket_forClient->close();
 	delete client_resolver;
 	delete socket_forClient;
@@ -131,7 +132,8 @@ main(int argc, char* argv[])
 		conquering.startConnection(SERVER_IP);
 		if (conquering.getError().type == N_ERROR)
 		{
-			conquering.sendMessage(route);
+			conquering.generateStringToSend(route);
+			conquering.sendMessage();
 			conquering.receiveMessage();
 		}
 		free(route.hostName);
