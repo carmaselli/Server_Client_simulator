@@ -24,7 +24,7 @@ void Client::startConnection(const char * host)
 	if (error)
 	{
 		error_.type == CONNECTION_ERROR;
-		error_.errStr = string("Error while trying to listen to ") + to_string(HELLO_PORT_STR) + "Port " + error.message();
+		error_.errStr = string("Error while trying to listen to ") + HELLO_PORT_STR + "Port " + error.message();
 
 		/*cout << "Error connecting to " << host << " Error Message: " << error.message() << endl;
 		if (error.value() == boost::asio::error::connection_refused)
