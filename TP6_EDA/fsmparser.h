@@ -12,7 +12,7 @@ using namespace std;
 
 #define SPACE " "
 #define TWOPOINTS ":"
-
+#define CRLF "\u000d\u000a"
 /* PROTOTIPOS */
 void fsmError(void* pointer);
 void savePath(void* pointer);
@@ -62,7 +62,6 @@ class fsmparser
 public:
 
 	fsmparser(char* str2parse_);
-	~fsmparser();
 	bool parse(void);
 
 	string getHost(void);
