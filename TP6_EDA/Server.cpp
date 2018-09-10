@@ -211,10 +211,31 @@ long int Server::fileLength(FILE * filename)
 
 void Server::fillTimestamps(void)
 {
+	//time_t now = time(0); // get de la fecha actual en time_t
+	//tm* expDate = gmtime(&now); // cambio el formato de la misma
+	//time_t nowtime = mktime(expDate);
+	//timestamp = ctime((const time_t*)&nowtime); // guardo en string la fecha actual
+	//time_t expiration = mktime(expDate) + (time_t)30; // sumo los 30 segundos
+	//timestampExp = ctime(&expiration); // guardo en string la fecha de expiración
+
 	time_t now = time(0); // get de la fecha actual en time_t
-	tm* expDate = gmtime(&now); // cambio el formato de la misma
-	time_t nowtime = mktime(expDate);
-	timestamp = ctime((const time_t*)&nowtime); // guardo en string la fecha actual
-	time_t expiration = mktime(expDate) + (time_t)30; // sumo los 30 segundos
+	tm* nowDate = gmtime(&now); // cambio el formato de la misma
+	time_t nowtime = mktime(nowDate);
+
+	time_t expiration = mktime(nowDate) + (time_t)30; // sumo los 30 segundos
 	timestampExp = ctime(&expiration); // guardo en string la fecha de expiración
+
+	tm* expDate = localtime(&expiration);
+
+	char expBuff[100], nowBuff[100];
+
+	strftime(nowBuff, 100, "%a,%d %b %Y %X GMT", nowDate);
+	strftime(expBuff, 100, "%a,%d %b %Y %X GMT", expDate);
+
+	string nowString(nowBuff);
+	string expString(expBuff);
+
+	timestamp = nowString;
+	timestampExp = expString;
+
 }
