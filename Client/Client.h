@@ -12,7 +12,7 @@
 #define HELLO_PORT_STR "80"
 #define SERVER_IP "localhost"
 
-
+#define PATH "C:\\Users\\fliatondi\\source\\repos\\Server_Client_simulator\\TP6_EDA"
 
 #define MESSAGE(x) "GET " (x) "HTTP/1.1 \r\nHost : 127.0.0.1 \r\n\r\n"
 
@@ -20,8 +20,8 @@
 
 typedef struct
 {
-	char *hostName;
-	char *pathRoute;
+	string hostName;
+	string pathRoute;
 	bool validation;
 }parseString;
 

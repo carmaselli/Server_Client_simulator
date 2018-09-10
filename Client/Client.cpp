@@ -1,5 +1,5 @@
 #include "Client.h"
-
+ 
 using namespace std;
 Client::Client()
 {
@@ -35,7 +35,7 @@ void Client::startConnection(const char * host)
 
 void Client::generateStringToSend(parseString route)
 {
-	messageToServer = "GET " + string(route.hostName) + string(route.pathRoute) + "HTTP/1.1 \r\nHost : 127.0.0.1 \r\n\r\n";
+	messageToServer = "GET " + route.pathRoute + " HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n";
 }
 
 void Client::sendMessage(void)
@@ -63,6 +63,7 @@ void Client::receiveMessage()
 {
 	if (error_.type == N_ERROR)
 	{
+		char buf[512];
 		boost::system::error_code error;
 		size_t len = 0;
 		cout << "Receiving Message" << std::endl;
@@ -73,7 +74,7 @@ void Client::receiveMessage()
 
 		do
 		{
-			len = socket_forClient->read_some(boost::asio::buffer(messageFromServer), error);
+			len = socket_forClient->read_some(boost::asio::buffer(buf), error);
 
 			boost::timer::cpu_times currentTime = t.elapsed();
 
@@ -84,14 +85,19 @@ void Client::receiveMessage()
 				cout << "Pasaron " << (int)floor(elapsedSeconds) << " segundos." << endl;
 			}
 
-			//if (!error)
+			if (!error)
+			{
+				messageFromServer += buf;
+			}
 
 
 		} while (error.value() == WSAEWOULDBLOCK);
 
 		if (!error)
 		{
+			messageFromServer[len] = '\0';
 			fputs(messageFromServer.c_str(), file);
+			printf("%s", messageFromServer.c_str());
 			error_.errStr = string("Succes reading from server");
 		}
 		else
@@ -136,8 +142,6 @@ main(int argc,const char* argv[])
 			conquering.sendMessage();
 			conquering.receiveMessage();
 		}
-		//free(route.hostName);
-		//free(route.pathRoute);
 		cout << conquering.getError().errStr << endl;
 	}
 	else
@@ -155,25 +159,18 @@ parseString clientParser(int argc, const char *argv[])
 {
 	parseString route;
 	string s(argv[1]);		//copio el contenido del arreglo en un string
-	string::size_type pos = s.find_first_of('/', 0);
+	string::size_type pos = s.find_first_of('\\', 0);
 	if (pos != string::npos)	//busco el primer '/'
 	{
-		if ((route.hostName = (char *)malloc(pos * sizeof(char))) != NULL)
+		route.hostName = s.substr(0, pos);
+		route.hostName[pos] = '\0';			//cargo null terminated... notar que sobre escribo al '/'
+		string::size_type finalSlashPos = s.find_last_of('\\', string::npos);		//busco el ultimo separador
+		if ((finalSlashPos != string::npos) && (finalSlashPos != (s.length() - 1)))		//me fijo que el path no termine con una barra 
 		{
-			s.copy(route.hostName, pos, 0);		//no guardo valor de retorno por el metodo copy ya que no me interesa saber hasta que posicion llego pues es la misma que pos
-			route.hostName[pos] = '\0';			//cargo null terminated... notar que sobre escribo al '/'
-			string::size_type finalSlashPos = s.find_last_of('/', string::npos);		//busco el ultimo separador
-			if ((finalSlashPos != string::npos) && (finalSlashPos != (s.length() - 1)))		//me fijo que el path no termine con una barra 
-			{
-				if ((route.pathRoute = (char *)malloc((s.length() - pos) * sizeof(char))) != NULL)
-				{
-					s.copy(route.pathRoute, s.length(), pos);
-					route.pathRoute[s.length() - pos] = '\0';
-					route.validation = true;
-					return route;
-				}
-			}
-			free(route.hostName);
+			route.pathRoute = s.substr(pos, s.length()-pos);
+			route.pathRoute[s.length() - pos] = '\0';
+			route.validation = true;
+			return route;
 		}
 	}
 	route.validation = false;
