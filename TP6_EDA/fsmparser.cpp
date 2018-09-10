@@ -33,7 +33,7 @@ destructor del objeto fsmparser
 fsmparser::
 ~fsmparser(void)
 {
-	free(str2parse);
+	//free(str2parse);
 }
 
 

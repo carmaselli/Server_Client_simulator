@@ -10,6 +10,7 @@
 Server::Server()
 {
 	error_.type = N_ERROR;
+	parseOk = false;
 	IO_handler = new boost::asio::io_service();
 	boost::asio::ip::tcp::endpoint ep(boost::asio::ip::tcp::v4(), HELLO_PORT);
 
@@ -92,7 +93,7 @@ void Server::receiveMessage() //falta cambiar esto
 
 		if (!error)
 			buf[len] = '\0';
-		receivedMessage += string(buf);
+		receivedMessage = string(buf);
 
 	} while (error.value() == WSAEWOULDBLOCK);
 
@@ -104,10 +105,12 @@ void Server::receiveMessage() //falta cambiar esto
 			if (!Parser.parse()) //parseo del string
 			{
 				fillMessage(Parser);
+				parseOk = true;
 			}
 			else
 			{
-				//ver que hacer aca para que se repita
+				cout << "Reiceved something with incorrect format";
+				parseOk = false;
 			}
 		}
 		else
@@ -124,6 +127,11 @@ void Server::receiveMessage() //falta cambiar esto
 	}
 		
 
+}
+
+bool Server::getParseOk()
+{
+	return parseOk;
 }
 
 error_t Server::getError()
@@ -169,9 +177,9 @@ void Server::fillMessage(fsmparser& Parser)
 	{
 		messageForClient = string("HTTP/1.1 404 Not Found" CRLF);
 		fillTimestamps();
-		messageForClient += string("Date: ") + timestamp + CRLF;
+		messageForClient += string("Date: Sun, 18 Oct 2012 10:36:20 GMT ");// +timestamp + CRLF;
 		messageForClient += string("Cache-Control: public, max-age=30" CRLF);
-		messageForClient += string("Expires: ") + timestampExp + CRLF;
+		messageForClient += string("Expires: Sun, 18 Oct 2012 10:36:20 GMT");// +timestampExp + CRLF;
 		messageForClient += string("Content-Length: 0" CRLF) ;
 		messageForClient += string("Content-Type: text/html; charset=iso-8859-1" CRLF)  ;
 	}

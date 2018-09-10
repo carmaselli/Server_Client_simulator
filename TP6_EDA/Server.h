@@ -25,6 +25,8 @@ public:
 	void sendMessage(const char* message);
 	void receiveMessage();
 
+
+	bool getParseOk();
 	error_t getError();
 	~Server();
 private:
@@ -33,6 +35,7 @@ private:
 	string messageForClient;
 	string timestamp;
 	string timestampExp;
+	bool parseOk;
 
 
 	boost::asio::io_service*  IO_handler;

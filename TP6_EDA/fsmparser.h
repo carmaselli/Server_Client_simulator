@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
+#include<stdlib.h>
 
 using namespace std;
 
