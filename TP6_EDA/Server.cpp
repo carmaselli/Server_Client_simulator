@@ -150,6 +150,8 @@ Server::~Server()
 
 void Server::readFile(FILE* filename)
 {
+	rewind(filename);
+	htmlFileContent = "";
 	do
 	{
 		htmlFileContent += fgetc(filename);
@@ -170,7 +172,7 @@ void Server::fillMessage(fsmparser& Parser)
 		messageForClient += string("Expires: ") + timestampExp + CRLF;
 		messageForClient += string("Content-Length: ") + to_string(fileLength(htmlFile)) + CRLF;
 		messageForClient += string("Content-Type: text/html; charset=iso-8859-1") + CRLF;
-		messageForClient += htmlFileContent + CRLF;
+		messageForClient += htmlFileContent;
 		fclose(htmlFile);
 	}
 	else
@@ -201,7 +203,8 @@ bool Server::isFilePresent(const char * path)
 
 long int Server::fileLength(FILE * filename)
 {
-	fseek(filename, 0, SEEK_END);
+	char a = fgetc(filename);
+	int b = fseek(filename, 0, SEEK_END);
 	long int fileLength = ftell(filename);
 	return fileLength;
 }
