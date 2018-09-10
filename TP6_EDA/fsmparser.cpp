@@ -188,7 +188,7 @@ void savePath(void* pointer)
 
 	if (p2token != NULL)
 	{
-		p2obj->setPath(p2token); // guardo el path en la variable indicada
+		p2obj->setPath((p2token+1)); // guardo el path en la variable indicada (sumo 1 para omitir la barra)
 		
 	}
 
