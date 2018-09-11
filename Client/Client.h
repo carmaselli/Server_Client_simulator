@@ -17,7 +17,6 @@
 #define MESSAGE(x) "GET " (x) "HTTP/1.1 \r\nHost : 127.0.0.1 \r\n\r\n"
 
 
-
 typedef struct
 {
 	string hostName;
@@ -25,7 +24,7 @@ typedef struct
 	bool validation;
 }parseString;
 
-parseString clientParser(int argc, const char* argv[]);
+
 
 class Client
 {

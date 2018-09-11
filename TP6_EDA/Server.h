@@ -7,7 +7,6 @@
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
-#include <boost/asio.hpp>
 #include <boost/chrono.hpp>
 #include <boost/timer/timer.hpp>
 #include"error.h"

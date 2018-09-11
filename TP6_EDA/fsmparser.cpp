@@ -7,21 +7,15 @@ constructor del objeto fsmparser
 */
 
 fsmparser::
-fsmparser(const char* str2parse_)
+fsmparser(string* str2parse_)
 {
 	error = false; // no hay error
 	host = "NULL";
 	path = "NULL";
 	currState = WAIT_FOR_GET_STATE; // estado inicial
-	str2parse = (char*)malloc(strlen(str2parse_));
-	if (str2parse == NULL)
-	{
-		error = true;
-	}
-	else
-	{
-		strcpy(str2parse, str2parse_);
-	}
+	str2parse = str2parse_;
+	lastPointer = 0;
+
 }
 
 
@@ -30,11 +24,6 @@ fsmparser()
 destructor del objeto fsmparser
 */
 
-fsmparser::
-~fsmparser(void)
-{
-	//free(str2parse);
-}
 
 
 /*
@@ -46,6 +35,12 @@ bool fsmparser::
 getError(void)
 {
 	return error;
+}
+
+unsigned int 
+fsmparser::getOffset(void)
+{
+	return lastPointer;
 }
 
 
@@ -71,7 +66,7 @@ getPath(void)
 	return path;
 }
 
-char * fsmparser::
+string * fsmparser::
 getString(void)
 {
 	return str2parse;
@@ -91,18 +86,17 @@ setHost()
 setter de la variable string host
 */
 void fsmparser::
-setHost(char* p2token_)
+setHost(string* p2token_)
 {
-	string s(p2token_);
-	host = s;
+	host = *p2token_;
 }
 
 void fsmparser::
-setPath(char * p2token_)
+setPath(string * p2token_)
 {
-	string s(p2token_);
-	path = s;
+	path = *p2token_;
 }
+
 
 /*
 * eventGen()
@@ -110,22 +104,22 @@ setPath(char * p2token_)
 */
 
 event_t fsmparser::
-eventGen(char* pointer)
+eventGen(void)
 {
 	event_t ev;
-	
-	ev.token = strtok((currState == WAIT_FOR_GET_STATE) ? pointer : NULL, SPACE); // genero token, en función del estado actual
-
-	if (ev.token != NULL)
-	{
-		if (!strcmp((const char *)ev.token, "GET"))
+	int newPointer = 0;
+	string get = "GET ";
+	string http = "HTTP/1.1" CRLF "Host:";
+		if ((newPointer = str2parse->find(get,lastPointer)) != string::npos)
 		{
 			ev.currentEv = GET_EVENT;
+			lastPointer = (newPointer + 5); // set del nuevo offset, sumando el largo del string buscado
 		}
 
-		else if (!strcmp((const char *)ev.token, "HTTP/1.1" CRLF "Host:"))
+		else if ((newPointer = str2parse->find("HTTP/1.1\u000d\u000aHost:", lastPointer)) != string::npos)
 		{
 			ev.currentEv = HTTP_STRING_EVENT;
+			lastPointer = (newPointer + 15); // set del nuevo offset, sumado el largo del string buscado
 		}
 
 
@@ -134,13 +128,7 @@ eventGen(char* pointer)
 			ev.currentEv = OTHER_EVENT;
 		}
 
-	}
-	else
-	{
-		error = true;
-	}
-
-	return ev;
+		return ev;
 }
 
 /*
@@ -165,9 +153,9 @@ cycleFSM(event_t ev)
 bool fsmparser::
 parse(void)
 {
-	while ( (currState != END_STATE) && (error == false)) // mientras no llegué al final, y no hubo error
+	while ((currState != END_STATE) && (error == false)) // mientras no llegué al final, y no hubo error
 	{
-		cycleFSM(eventGen(str2parse)); // ciclo la fsm
+		cycleFSM(eventGen()); // ciclo la fsm
 	}
 
 	return error;
@@ -177,19 +165,20 @@ parse(void)
 
 void fsmError(void* pointer)
 {
-	fsmparser* p2obj = (fsmparser*) pointer;
+	fsmparser* p2obj = (fsmparser*)pointer;
 	p2obj->setError();
 }
 
 void savePath(void* pointer)
 {
 	fsmparser* p2obj = (fsmparser*)pointer;
-	char* p2token = strtok(NULL, SPACE);
+	unsigned int lastPointer = p2obj->getOffset();
+	unsigned int spacePos = p2obj->getString()->find(" ", lastPointer);
+	string str = p2obj->getString()->substr(lastPointer, spacePos - lastPointer); // obtengo el substring con lo necesario
 
-	if (p2token != NULL)
+	if (spacePos != string::npos)
 	{
-		p2obj->setPath((p2token+1)); // guardo el path en la variable indicada (sumo 1 para omitir la barra)
-		
+		p2obj->setPath(&str); // guardo el path en la variable indicada (sumo 1 para omitir la barra)
 	}
 
 	else
@@ -201,11 +190,14 @@ void savePath(void* pointer)
 void saveHost(void* pointer)
 {
 	fsmparser* p2obj = (fsmparser*)pointer;
-	char* p2token = strtok(NULL, CRLF);
+	unsigned int lastPointer = p2obj->getOffset();
+	unsigned int spacePos = p2obj->getString()->find(CRLF, lastPointer);
+	string str = p2obj->getString()->substr(lastPointer, spacePos - lastPointer); // obtengo el substring con lo necesario
 
-	if (p2token != NULL)
+	if (spacePos != string::npos)
 	{
-		p2obj->setHost(p2token); // guardo el host en la variable indicada
+		p2obj->setHost(&str); // guardo el path en la variable indicada (sumo 1 para omitir la barra)
+
 	}
 
 	else

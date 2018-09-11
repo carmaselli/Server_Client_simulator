@@ -3,7 +3,7 @@
 #include <boost/filesystem.hpp>
 
 
-#define BUFF_LEN 152
+#define BUFF_LEN 512
 
 
 
@@ -89,19 +89,21 @@ void Server::receiveMessage()
 	
 	do   //espero recibir algo
 	{
-		len = socket_forServer->read_some(boost::asio::buffer(buf), error);
+		len = socket_forServer->read_some(boost::asio::buffer(buf,BUFF_LEN), error);
 
 		if (!error)
-			buf[len] = '\0';
-		receivedMessage = string(buf);
+			receivedMessage = string(buf);
+			//buf[len] = '\0';
+		
 
 	} while (error.value() == WSAEWOULDBLOCK);
 
 	if (!error)
 	{
-		fsmparser Parser((receivedMessage.c_str()));
+		fsmparser Parser(&receivedMessage);
 		if (Parser.getError() == false)
 		{
+			parseOk = false;
 			if (!Parser.parse()) //parseo del string
 			{
 				fillMessage(Parser);
@@ -122,7 +124,7 @@ void Server::receiveMessage()
 	else
 	{
 		error_.type = CONNECTION_ERROR;
-		error_.errStr = string("Error while trying to connect to server ") + error.message() ;
+		error_.errStr = string("Error while trying to connect to client ") + error.message() ;
 		
 	}
 		
@@ -146,6 +148,7 @@ Server::~Server()
 	delete server_acceptor;
 	delete socket_forServer;
 	delete IO_handler;
+	parseOk = false;
 }
 
 void Server::readFile(FILE* filename)

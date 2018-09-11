@@ -19,7 +19,7 @@ void fsmError(void* pointer);
 void savePath(void* pointer);
 void saveHost(void* pointer);
 
-typedef enum 
+typedef enum
 {
 	GET_EVENT,
 	HTTP_STRING_EVENT,
@@ -49,7 +49,6 @@ typedef struct
 /* TYPEDEFS */
 typedef struct
 {
-	char* token;
 	FSM_EVENTS  currentEv;
 }event_t;
 
@@ -60,18 +59,18 @@ class fsmparser
 {
 public:
 
-	fsmparser(const char* str2parse_);
-	~fsmparser(void);
+	fsmparser(string* str2parse_);
 	bool parse(void);
 
 	string getHost(void);
 	string getPath(void);
-	char* getString(void);
-	bool getError();
+	string* getString(void);
+	bool getError(void);
+	unsigned int getOffset(void);
 
 	void setError(void);
-	void setHost(char* p2token_);
-	void setPath(char* p2token_);
+	void setHost(string* p2token_);
+	void setPath(string* p2token_);
 
 
 
@@ -79,11 +78,12 @@ private:
 
 	string host;
 	string path;
-	char* str2parse;
+	string* str2parse;
+	unsigned int lastPointer;
 	FSM_STATES currState;
 	bool error;
 
-	event_t eventGen(char* pointer); // devuelve el evento
+	event_t eventGen(void); // devuelve el evento
 
 	void cycleFSM(event_t ev);
 
@@ -96,4 +96,3 @@ private:
 
 
 };
-
