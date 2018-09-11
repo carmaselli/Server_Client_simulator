@@ -5,7 +5,7 @@
 #include<conio.h>
 
 
-void hola()
+void wrapper()
 {
 	Server myServer;
 	std::cout << std::endl << "Start Listening on port " << HELLO_PORT << std::endl;
@@ -19,10 +19,11 @@ void hola()
 			myServer.receiveMessage();
 		} while (!myServer.getParseOk());
 		myServer.sendMessage();
-		Sleep(50); // Le damos 50ms para que llegue el mensaje antes de volver a esperar (hace falta?)		
-	//} while (myServer.getError().type == NO_ERROR);
-	cout << myServer.getError().errStr;
-
+		Sleep(50); // Le damos 50ms para que llegue el mensaje antes de volver a esperar 	
+		if (myServer.getError().type != N_ERROR)
+		{
+			cout << myServer.getError().errStr;
+		}
 }
 
 int main(int argc, char* argv[])
@@ -30,7 +31,7 @@ int main(int argc, char* argv[])
 	
 	while (1)
 	{
-		hola();
+		wrapper(); //con esto sigue corriendo el server pero es una negrada
 	}
 	return EXIT_SUCCESS;
 }

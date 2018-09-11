@@ -3,7 +3,7 @@
 #include <boost/filesystem.hpp>
 
 
-
+#define BUFF_LEN 152
 
 
 
@@ -46,7 +46,7 @@ void Server::startConnection()
 
 void Server::sendMessage() 
 {
-	if (error_.type == NO_ERROR)
+	if (error_.type == N_ERROR)
 	{
 		size_t len;
 		boost::system::error_code error;
@@ -79,10 +79,10 @@ void Server::sendMessage(const char * message)
 	}
 }
 
-void Server::receiveMessage() //falta cambiar esto
+void Server::receiveMessage() 
 {
 	boost::system::error_code error;
-	char buf[512];
+	char buf[BUFF_LEN];
 	size_t len = 0;
 	string receivedMessage;
 	cout << "Receiving Message" << std::endl;
@@ -179,9 +179,9 @@ void Server::fillMessage(fsmparser& Parser)
 	{
 		messageForClient = string("HTTP/1.1 404 Not Found" CRLF);
 		fillTimestamps();
-		messageForClient += string("Date: Sun, 18 Oct 2012 10:36:20 GMT ");// +timestamp + CRLF;
+		messageForClient += string("Date: ")+timestamp + CRLF;
 		messageForClient += string("Cache-Control: public, max-age=30" CRLF);
-		messageForClient += string("Expires: Sun, 18 Oct 2012 10:36:20 GMT");// +timestampExp + CRLF;
+		messageForClient += string("Expires: ") +timestampExp + CRLF;
 		messageForClient += string("Content-Length: 0" CRLF) ;
 		messageForClient += string("Content-Type: text/html; charset=iso-8859-1" CRLF)  ;
 	}
